@@ -50,8 +50,8 @@ async function checkCustomerData() {
     document.getElementById('resultBox').style.display = "none";
 
     try {
-        // 🔄 রেন্ডারের ডোমেইন বাদ দিয়ে সরাসরি ভার্সেলের ইন্টারনাল রুট কল করা হচ্ছে
-        let response = await fetch(`/api/verify?phone=${phone}`);
+        // 🔄 সুপাবেসের নতুন swift-api লিঙ্ক এখানে বসানো হয়েছে
+        let response = await fetch(`https://uvstfikfkfpywvmwikcr.functions.supabase.co/swift-api?phone=${phone}`);
         let data = await response.json();
 
         document.getElementById('resPhone').innerText = data.phone;
