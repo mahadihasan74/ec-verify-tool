@@ -55,11 +55,16 @@ async function checkCustomerData() {
     else if (phone.startsWith("88")) phone = phone.substring(2);
     if (!phone.startsWith("0")) phone = "0" + phone;
 
-    // 🔗 আপনার গুগল স্ক্রিপ্টের লাইভ লিঙ্কটি এখানে পারফেক্টলি সেট করা হয়েছে
     const googleScriptUrl = "https://script.google.com/macros/s/AKfyby38kUTO3UJ6Gudo3kQjnvPdbtSZMMYJ9k_vjxNf-QMHcvqrbEftccnFBFUdu342Wq/exec";
 
     try {
-        let response = await fetch(`${googleScriptUrl}?phone=${phone}`);
+        // 🚀 গুগলের রিডাইরেক্ট ও কর্স পলিসি বাইপাস করতে mode: "cors" এবং redirect: "follow" যোগ করা হলো
+        let response = await fetch(`${googleScriptUrl}?phone=${phone}`, {
+            method: "GET",
+            mode: "cors",
+            redirect: "follow"
+        });
+        
         let data = await response.json();
 
         document.getElementById('resPhone').innerText = phone;
@@ -75,7 +80,7 @@ async function checkCustomerData() {
         document.getElementById('resultBox').style.display = "block";
     } catch (error) {
         console.error(error);
-        alert("ডাটা লোড করতে সমস্যা হচ্ছে। আপনার গুগল স্ক্রিপ্ট অ্যাক্সেস Anyone দেওয়া আছে কি না নিশ্চিত করুন।");
+        alert("ডাটা কানেকশনে সমস্যা হচ্ছে। পেজটি রিফ্রেশ দিয়ে আবার চেষ্টা করুন।");
     } finally {
         document.getElementById('loadingText').style.display = "none";
     }
