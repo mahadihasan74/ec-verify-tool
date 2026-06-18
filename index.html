@@ -142,43 +142,37 @@ async function checkCustomerData() {
         return; 
     }
 
-    // লোডিং স্ক্রিন চালু করা এবং আগের রেজাল্ট লুকানো
     document.getElementById('loadingText').style.display = "block";
     document.getElementById('resultBox').style.display = "none";
 
-    // 🔗 আপনার লাইভ রেন্ডার ব্যাকএন্ড ইউআরএল
-    const BACKEND_URL = "https://ec-verify-backend-1.onrender.com"; 
+    // 🔗 আপনার একদম নতুন রেন্ডার লাইভ লিঙ্কটি এখানে সঠিকভাবে বসানো হয়েছে
+    const BACKEND_URL = "https://ec-verify-backend.onrender.com"; 
 
     try {
-        // ব্যাকএন্ড এপিআই হিট করা হচ্ছে
         let response = await fetch(`${BACKEND_URL}/api/verify?phone=${phone}`);
         let data = await response.json();
 
         if(data.status === "success") {
-            // স্ক্রিনের কন্টেন্ট আপডেট
             document.getElementById('resPhone').innerText = data.phone;
             document.getElementById('resSF').innerText = data.steadfast;
             document.getElementById('resPT').innerText = data.pathao;
             document.getElementById('resRX').innerText = data.redx;
             
-            // হোয়াটসঅ্যাপ ডায়নামিক লিঙ্ক জেনারেট করা
             let cleanPhone = data.phone;
             if(cleanPhone.startsWith("0")) {
-                cleanPhone = "88" + cleanPhone; // দেশের কোড যোগ করা
+                cleanPhone = "88" + cleanPhone; 
             }
             let message = encodeURIComponent("হ্যালো, আপনার অর্ডারের কনফার্মেশনের জন্য নক দিয়েছি।");
             document.getElementById('waLink').href = `https://wa.me/${cleanPhone}?text=${message}`;
             
-            // রেজাল্ট বক্স শো করা
             document.getElementById('resultBox').style.display = "block";
         } else {
             alert("কোনো ডাটা পাওয়া যায়নি বা এপিআই রেসপন্সে সমস্যা।");
         }
     } catch (error) {
         console.error("Frontend Fetch Error:", error);
-        alert("সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার রেন্ডার ড্যাশবোর্ড চেক করুন অথবা একটু পর আবার চেষ্টা করুন।");
+        alert("সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। প্রথমবার লোড হতে ৫০-৬০ সেকেন্ড লাগতে পারে। দয়া করে একটু পর আবার চেষ্টা করুন।");
     } finally {
-        // লোডিং টেক্সট বন্ধ করা
         document.getElementById('loadingText').style.display = "none";
     }
 }
