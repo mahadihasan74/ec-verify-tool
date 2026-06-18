@@ -29,7 +29,7 @@
     <input type="text" id="phoneInput" placeholder="কাস্টমারের ফোন নম্বর দিন (01XXXXXXXXX)">
     <button onclick="checkCustomerData()">ডাটা চেক করুন</button>
     
-    <div id="loadingText" class="loading">⏳ কুরিয়ার এপিআই থেকে ডাটা লোড হচ্ছে...</div>
+    <div id="loadingText" class="loading">⏳ কুরিয়ার ডাটাবেজ থেকে লাইভ সার্চ হচ্ছে...</div>
 
     <div id="resultBox" class="result-box">
         <div class="result-item"><span class="label">নম্বর:</span> <span class="value" id="resPhone">-</span></div>
@@ -49,17 +49,36 @@ async function checkCustomerData() {
     document.getElementById('loadingText').style.display = "block";
     document.getElementById('resultBox').style.display = "none";
 
-    try {
-        // 🔄 সুপাবেসের নতুন swift-api লিঙ্ক এখানে বসানো হয়েছে
-        let response = await fetch(`https://uvstfikfkfpywvmwikcr.functions.supabase.co/swift-api?phone=${phone}`);
-        let data = await response.json();
+    if (phone.startsWith("+88")) phone = phone.replace("+88", "");
+    else if (phone.startsWith("88")) phone = phone.substring(2);
+    if (!phone.startsWith("0")) phone = "0" + phone;
 
-        document.getElementById('resPhone').innerText = data.phone;
-        document.getElementById('resSF').innerText = data.steadfast;
-        document.getElementById('resPT').innerText = data.pathao;
-        document.getElementById('resRX').innerText = data.redx;
+    // 🚀 অল্টারনেটিভ ফ্রি ওপেন কর্স বাইপাস গেটওয়ে ব্যবহার
+    const targetUrl = `https://vapi.steadfast.com.bd/api/v1/delivery-statistics/${phone}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+    try {
+        let response = await fetch(proxyUrl);
+        let proxyData = await response.json();
+        let resData = JSON.parse(proxyData.contents);
+
+        let steadfastReport = "কোনো পূর্ববর্তী রেকর্ড নেই";
+
+        if (resData && resData.success && resData.statistics) {
+            let d = resData.statistics;
+            let total = (d.delivered || 0) + (d.cancelled || 0);
+            let rate = d.success_rate || (total > 0 ? Math.round((d.delivered / total) * 100) : 0);
+            if (total > 0) {
+                steadfastReport = `ডেলিভারি: ${rate}% (মোট: ${total}, রিটার্ন: ${d.cancelled || 0})`;
+            }
+        }
+
+        document.getElementById('resPhone').innerText = phone;
+        document.getElementById('resSF').innerText = steadfastReport;
+        document.getElementById('resPT').innerText = "কী সেট করা নেই";
+        document.getElementById('resRX').innerText = "কী সেট করা নেই";
         
-        let cleanPhone = data.phone;
+        let cleanPhone = phone;
         if(cleanPhone.startsWith("0")) { cleanPhone = "88" + cleanPhone; }
         let message = encodeURIComponent("হ্যালো, আপনার অর্ডারের কনফার্মেশনের জন্য নক দিয়েছি।");
         document.getElementById('waLink').href = `https://wa.me/${cleanPhone}?text=${message}`;
@@ -67,7 +86,7 @@ async function checkCustomerData() {
         document.getElementById('resultBox').style.display = "block";
     } catch (error) {
         console.error(error);
-        alert("ডাটা লোড করা যাচ্ছে না। দয়া করে আবার চেষ্টা করুন।");
+        alert("কুরিয়ার সার্ভার রেসপন্স করছে না। দয়া করে একটু পর আবার চেষ্টা করুন।");
     } finally {
         document.getElementById('loadingText').style.display = "none";
     }
