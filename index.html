@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eCommerce Internal Verify Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; padding: 40px; display: flex; justify-content: center; align-items: center; min-height: 80vh; }
@@ -53,30 +55,17 @@ async function checkCustomerData() {
     else if (phone.startsWith("88")) phone = phone.substring(2);
     if (!phone.startsWith("0")) phone = "0" + phone;
 
-    // 🚀 অল্টারনেটিভ ফ্রি ওপেন কর্স বাইপাস গেটওয়ে ব্যবহার
-    const targetUrl = `https://vapi.steadfast.com.bd/api/v1/delivery-statistics/${phone}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+    // 🔗 আপনার গুগল স্ক্রিপ্টের লাইভ লিঙ্কটি এখানে পারফেক্টলি সেট করা হয়েছে
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfyby38kUTO3UJ6Gudo3kQjnvPdbtSZMMYJ9k_vjxNf-QMHcvqrbEftccnFBFUdu342Wq/exec";
 
     try {
-        let response = await fetch(proxyUrl);
-        let proxyData = await response.json();
-        let resData = JSON.parse(proxyData.contents);
-
-        let steadfastReport = "কোনো পূর্ববর্তী রেকর্ড নেই";
-
-        if (resData && resData.success && resData.statistics) {
-            let d = resData.statistics;
-            let total = (d.delivered || 0) + (d.cancelled || 0);
-            let rate = d.success_rate || (total > 0 ? Math.round((d.delivered / total) * 100) : 0);
-            if (total > 0) {
-                steadfastReport = `ডেলিভারি: ${rate}% (মোট: ${total}, রিটার্ন: ${d.cancelled || 0})`;
-            }
-        }
+        let response = await fetch(`${googleScriptUrl}?phone=${phone}`);
+        let data = await response.json();
 
         document.getElementById('resPhone').innerText = phone;
-        document.getElementById('resSF').innerText = steadfastReport;
-        document.getElementById('resPT').innerText = "কী সেট করা নেই";
-        document.getElementById('resRX').innerText = "কী সেট করা নেই";
+        document.getElementById('resSF').innerText = data.steadfast;
+        document.getElementById('resPT').innerText = data.pathao;
+        document.getElementById('resRX').innerText = data.redx;
         
         let cleanPhone = phone;
         if(cleanPhone.startsWith("0")) { cleanPhone = "88" + cleanPhone; }
@@ -86,7 +75,7 @@ async function checkCustomerData() {
         document.getElementById('resultBox').style.display = "block";
     } catch (error) {
         console.error(error);
-        alert("কুরিয়ার সার্ভার রেসপন্স করছে না। দয়া করে একটু পর আবার চেষ্টা করুন।");
+        alert("ডাটা লোড করতে সমস্যা হচ্ছে। আপনার গুগল স্ক্রিপ্ট অ্যাক্সেস Anyone দেওয়া আছে কি না নিশ্চিত করুন।");
     } finally {
         document.getElementById('loadingText').style.display = "none";
     }
