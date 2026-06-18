@@ -3,23 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eCommerce Internal Verify Tool</title>
+    <title>eCommerce Internal Verify API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; padding: 40px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 450px; }
-        h2 { text-align: center; color: #1e293b; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #0070f3; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        button:hover { background: #0051b3; }
-        .result-box { margin-top: 25px; padding: 15px; background: #f1f5f9; border-radius: 8px; display: none; }
-        .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; align-items: center; }
-        .result-item:last-child { border: none; }
-        .label { font-weight: 600; color: #475569; }
-        .value { font-weight: 700; color: #0f172a; text-align: right; }
-        .loading { text-align: center; display: none; color: #64748b; margin-top: 15px; font-weight: bold; }
-        .btn-wa { background-color: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 10px; transition: background 0.3s; }
-        .btn-wa:hover { background-color: #1ebd57; }
+        body { 
+            font-family: 'Hind Siliguri', sans-serif; 
+            background-color: #f8fafc; 
+            padding: 40px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 80vh;
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 450px; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #1e293b; 
+            margin-bottom: 20px; 
+            font-weight: 700;
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        input:focus {
+            border-color: #0070f3;
+            outline: none;
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #0070f3; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 5px; 
+            font-family: 'Hind Siliguri', sans-serif;
+            transition: background 0.3s;
+        }
+        button:hover { 
+            background: #0051b3; 
+        }
+        .result-box { 
+            margin-top: 25px; 
+            padding: 15px; 
+            background: #f1f5f9; 
+            border-radius: 8px; 
+            display: none; 
+        }
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #e2e8f0; 
+            align-items: center; 
+        }
+        .result-item:last-child { 
+            border: none; 
+        }
+        .label { 
+            font-weight: 600; 
+            color: #475569; 
+        }
+        .value { 
+            font-weight: 700; 
+            color: #0f172a; 
+            text-align: right; 
+        }
+        .loading { 
+            text-align: center; 
+            display: none; 
+            color: #64748b; 
+            margin-top: 15px; 
+            font-weight: bold; 
+        }
+        .btn-wa { 
+            background-color: #25D366; 
+            color: white; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 14px; 
+            margin-top: 15px; 
+            transition: background 0.3s; 
+        }
+        .btn-wa:hover { 
+            background-color: #1ebd57; 
+        }
     </style>
 </head>
 <body>
@@ -44,67 +137,48 @@
 <script>
 async function checkCustomerData() {
     let phone = document.getElementById('phoneInput').value.trim();
-    if(!phone) { alert("দয়া করে একটি নম্বর দিন!"); return; }
+    if(!phone) { 
+        alert("দয়া করে একটি নম্বর দিন!"); 
+        return; 
+    }
 
+    // লোডিং স্ক্রিন চালু করা এবং আগের রেজাল্ট লুকানো
     document.getElementById('loadingText').style.display = "block";
     document.getElementById('resultBox').style.display = "none";
 
-    // নম্বরের ফরম্যাট ঠিক করা
-    if (phone.startsWith("+88")) {
-        phone = phone.replace("+88", "");
-    } else if (phone.startsWith("88")) {
-        phone = phone.substring(2);
-    }
-    if (!phone.startsWith("0")) {
-        phone = "0" + phone;
-    }
-
-    // আপনার রিয়াল ক্রেডেনশিয়াল সরাসরি ফ্রন্টএন্ড থেকে কল করা হচ্ছে
-    const API_KEY = "puqmh5ebcoaegq6kdxef2oohbabwttym";
-    const SECRET_KEY = "w5wpkhamys6neqawvcntn6yu";
+    // 🔗 আপনার লাইভ রেন্ডার ব্যাকএন্ড ইউআরএল
+    const BACKEND_URL = "https://ec-verify-backend-1.onrender.com"; 
 
     try {
-        // সরাসরি ভি-এপিআই ডোমেইনে ব্রাউজার থেকে রিকোয়েস্ট পাঠানো হচ্ছে
-        let response = await fetch('https://vapi.steadfast.com.bd/api/v1/fraud-check', {
-            method: 'POST',
-            headers: {
-                'Api-Key': API_KEY,
-                'Secret-Key': SECRET_KEY,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ phone: phone })
-        });
+        // ব্যাকএন্ড এপিআই হিট করা হচ্ছে
+        let response = await fetch(`${BACKEND_URL}/api/verify?phone=${phone}`);
+        let data = await response.json();
 
-        let resData = await response.json();
-
-        document.getElementById('resPhone').innerText = phone;
-        document.getElementById('resPT').innerText = "কী (API Key) সেট করা নেই";
-        document.getElementById('resRX').innerText = "কী (API Key) সেট করা নেই";
-
-        if(resData && (resData.status === 200 || resData.status === 'success')) {
-            let data = resData.data || resData;
-            document.getElementById('resSF').innerText = `ডেলিভারি: ${data.success_rate || 0}% (মোট: ${data.total_order || 0}, রিটার্ন: ${data.total_return || 0})`;
-        } else if (resData && resData.message) {
-            document.getElementById('resSF').innerText = resData.message;
+        if(data.status === "success") {
+            // স্ক্রিনের কন্টেন্ট আপডেট
+            document.getElementById('resPhone').innerText = data.phone;
+            document.getElementById('resSF').innerText = data.steadfast;
+            document.getElementById('resPT').innerText = data.pathao;
+            document.getElementById('resRX').innerText = data.redx;
+            
+            // হোয়াটসঅ্যাপ ডায়নামিক লিঙ্ক জেনারেট করা
+            let cleanPhone = data.phone;
+            if(cleanPhone.startsWith("0")) {
+                cleanPhone = "88" + cleanPhone; // দেশের কোড যোগ করা
+            }
+            let message = encodeURIComponent("হ্যালো, আপনার অর্ডারের কনফার্মেশনের জন্য নক দিয়েছি।");
+            document.getElementById('waLink').href = `https://wa.me/${cleanPhone}?text=${message}`;
+            
+            // রেজাল্ট বক্স শো করা
+            document.getElementById('resultBox').style.display = "block";
         } else {
-            document.getElementById('resSF').innerText = "কোনো পূর্ববর্তী রেকর্ড নেই";
+            alert("কোনো ডাটা পাওয়া যায়নি বা এপিআই রেসপন্সে সমস্যা।");
         }
-
     } catch (error) {
-        console.error("Steadfast Client Error:", error);
-        // যদি ব্রাউজার থেকে সরাসরি CORS এরর দেয়, তবে আমরা অল্টারনেটিভ মেসেজ হ্যান্ডেল করবো
-        document.getElementById('resPhone').innerText = phone;
-        document.getElementById('resSF').innerText = "কোনো পূর্ববর্তী রেকর্ড পাওয়া যায়নি";
+        console.error("Frontend Fetch Error:", error);
+        alert("সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার রেন্ডার ড্যাশবোর্ড চেক করুন অথবা একটু পর আবার চেষ্টা করুন।");
     } finally {
-        // হোয়াটসঅ্যাপ লিঙ্ক তৈরি
-        let cleanPhone = phone;
-        if(cleanPhone.startsWith("0")) {
-            cleanPhone = "88" + cleanPhone; 
-        }
-        let message = encodeURIComponent("হ্যালো, আপনার অর্ডারের কনফার্মেশনের জন্য নক দিয়েছি।");
-        document.getElementById('waLink').href = `https://wa.me/${cleanPhone}?text=${message}`;
-        
-        document.getElementById('resultBox').style.display = "block";
+        // লোডিং টেক্সট বন্ধ করা
         document.getElementById('loadingText').style.display = "none";
     }
 }
